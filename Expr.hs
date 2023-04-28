@@ -71,7 +71,13 @@ shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) _ = n
+value (Var v) env = error "todo"
+value (Add left right) env = value left env + value right env
+value (Sub left right) env = value left env - value right env
+value (Mul left right) env = value left env *  value right env
+value (Div left right) env = value left env / value right env
+
 
 instance Parse Expr where
     parse = expr
