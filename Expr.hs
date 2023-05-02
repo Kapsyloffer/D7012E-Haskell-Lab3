@@ -76,7 +76,9 @@ value (Var v) env = error "todo"
 value (Add left right) env = value left env + value right env
 value (Sub left right) env = value left env - value right env
 value (Mul left right) env = value left env *  value right env
-value (Div left right) env = value left env / value right env
+value (Div left right) env = case value right env of 
+        0 -> error "Cannot divide by zero" 
+        _ -> value left env / value right env
 
 
 instance Parse Expr where

@@ -5,11 +5,19 @@ import qualified Dictionary
 import qualified Expr
 type T = Statement
 data Statement =
-    Assignment String Expr.T |
-    If Expr.T Statement Statement
+    Assignment String Expr.T 
+    | If Expr.T Statement Statement --if statement
+    | Print Expr.T --Output a string.
+    | Read String -- Read a string as input.
+    | Seq [Statement] -- A sequence of statements.
+    | Skip --nop
+    | While Expr.T Statement --while loop if true
     deriving Show
-
+    
+assignment :: Parser Statement
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
+
+buildAss :: (String, Expr.t) -> Statement
 buildAss (v, e) = Assignment v e
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
