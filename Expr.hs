@@ -72,7 +72,7 @@ shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
-value (Var v) env = error "todo"
+value (Var x) env = case lookup x env of Just y -> y ; _ -> error (x ++ " undefined") -- stolen straight from lab2 lmao
 value (Add left right) env = value left env + value right env
 value (Sub left right) env = value left env - value right env
 value (Mul left right) env = value left env *  value right env

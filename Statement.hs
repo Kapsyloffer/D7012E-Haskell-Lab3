@@ -12,6 +12,7 @@ data Statement =
     | Seq [Statement] -- A sequence of statements.
     | Skip --nop
     | While Expr.T Statement --while loop if true
+    | Write Expr.T --Write
     deriving Show
     
 assignment :: Parser Statement
