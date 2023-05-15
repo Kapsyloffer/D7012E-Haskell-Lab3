@@ -3,13 +3,13 @@ import Prelude hiding (return, fail)
 import Parser hiding (T)
 import qualified Dictionary
 import qualified Expr
-type T = Statement
 
+type T = Statement
 data Statement =
     Assignment String Expr.T 
     | If Expr.T Statement Statement --if statement
-    | Read String -- Read a string as input.
-    | Repeat [Statement] -- repeatear en statement until...
+    | Read String -- Read a string as input. 
+    | Repeat Statement Expr.T -- repeatear en statement until...
     | Seq [Statement] -- A sequence of statements.
     | Skip --nop
     | While Expr.T Statement --while loop if true
@@ -17,14 +17,13 @@ data Statement =
     deriving Show
     
 assignment :: Parser Statement
-assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
-
-buildAss :: (String, Expr.T) -> Statement --hehe
-buildAss (v, e) = Assignment v e
+assignment = word #- accept ":=" # Expr.parse #- require ";" >-> build
+    where build :: (String, Expr.T) -> Statement 
+          build (v, e) = Assignment v e
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts: stmts) dict input = 
-    if (Expr.value cond dict)>0 
+    if (Expr.value cond dict) > 0 
     then exec (thenStmts: stmts) dict input
     else exec (elseStmts: stmts) dict input
 
@@ -65,7 +64,6 @@ parse_write = accept "write" -# Expr.parse #- require ";" >-> build
 
 instance Parse Statement where
     parse = assignment ! parse_if ! parse_read ! parse_repeat ! parse_seq ! parse_skip ! parse_while ! parse_write
-    toString :: Statement -> String
     toString (Assignment var val) = var ++ ":=" ++ Expr.toString val ++ ";\n" 
     toString (If cond thenStmts elseStmts) = "if" ++ Expr.toString cond ++ "then\n" ++ toString thenStmts  ++ "else\n" ++ toString elseStmts
     toString (Read s) = "read" ++ s ++ ";\n"
