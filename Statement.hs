@@ -22,10 +22,29 @@ assignment = word #- accept ":=" # Expr.parse #- require ";" >-> build
           build (v, e) = Assignment v e
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
+exec [] _ _ = []
 exec (If cond thenStmts elseStmts: stmts) dict input = 
     if (Expr.value cond dict) > 0 
     then exec (thenStmts: stmts) dict input
     else exec (elseStmts: stmts) dict input
+-- if [] then [] else []
+exec (Assignment v e: stmts) dict input = exec stmts (Dictionary.insert(v, (Expr.value e dict), dict)) input 
+-- v <- e; varav e parsas och Insert returnar den nya dictionarien som används av stmts, som är resten av koden
+exec (Read s: stmts) dict input = exec stmts (Dictionary.insert (s, head input) dict) (tail input)
+-- s <- head of string, varav vi sätter första bokstaven av varje string i s så att den kan läsas.
+--exec (Repeat d cond) = error "not yet"
+-- not good
+exec (Seq s : stmts) dict input = exec s dict input ++ exec stmts dict input
+-- Kör en statement åt gången i en sequence, och sen executa resten då headen blivit executad
+exec (Skip : stmts) dict input = exec stmts dict input
+-- Skippa
+exec (While cond do_:stms) dict input = 
+    if (Expr.value cond dict) > 0
+    then exec (do_: While cond do_: stms) dict input
+    else exec stms dict input
+-- While är basically en glorified if, och den kör tills den inte kör och då kör den allt annat.
+exec (Write s :stmts) dict input = Expr.value s dict : exec stmts dict input
+-- Write basically does stuff.
 
 parse_if :: Parser Statement --parsea en if then else statement
 parse_if = accept "if" -# Expr.parse #- require "then" # parse #- accept "else" # parse  >-> build
