@@ -34,16 +34,16 @@ letter =  (?) char isAlpha --check each character if it's a character.
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
-chars :: Int -> Parser String --For n letters, parse that many. For example we parse 3 for "hej"
-chars n =  iter_int char where 
-    iter_int m 0 = return []
-    iter_int m n = iter_int = m # iter_int m (n-1) >-> cons 
+chars :: Int -> Parser String
+chars n = iter_int n char
+  where iter_int 0 _ = return []
+        iter_int n m = m # iter_int (n-1) m >-> cons
 
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
 
 require :: String -> Parser String
-require w  = accept w ! err "wrong string" ++ w 
+require w = accept w ! err "wrong string"
 
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
