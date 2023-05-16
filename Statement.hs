@@ -23,25 +23,19 @@ assignment = word #- accept ":=" # Expr.parse #- require ";" >-> build
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
-exec (If cond thenStmts elseStmts: stmts) dict input = 
-    if (Expr.value cond dict) > 0 
-    then exec (thenStmts: stmts) dict input
-    else exec (elseStmts: stmts) dict input
+exec (If cond thenStmts elseStmts: stmts) dict input = if (Expr.value cond dict) > 0 then exec (thenStmts: stmts) dict input else exec (elseStmts: stmts) dict input
 -- if [] then [] else []
-exec (Assignment v e: stmts) dict input = exec stmts (Dictionary.insert (v, Expr.value e dict) dict) input
+exec (Assignment v e : stmts) dict input = exec stmts (Dictionary.insert (v, Expr.value e dict) dict) input
 -- v <- e; varav e parsas och Insert returnar den nya dictionarien som används av stmts, som är resten av koden
 exec (Read s: stmts) dict input = exec stmts (Dictionary.insert (s, head input) dict) (tail input)
 -- s <- head of string, varav vi sätter första bokstaven av varje string i s så att den kan läsas.
---exec (Repeat d cond) = error "not yet"
--- not good
+exec (Repeat do_ cond : stms) dict input = error "todo"
+--repeat
 exec (Seq s : stmts) dict input = exec s dict input ++ exec stmts dict input
 -- Kör en statement åt gången i en sequence, och sen executa resten då headen blivit executad
 exec (Skip : stmts) dict input = exec stmts dict input
 -- Skippa
-exec (While cond do_:stms) dict input = 
-    if (Expr.value cond dict) > 0
-    then exec (do_: While cond do_: stms) dict input
-    else exec stms dict input
+exec (While cond do_:stms) dict input =  if (Expr.value cond dict) > 0 then exec (do_: While cond do_: stms) dict input else exec stms dict input
 -- While är basically en glorified if, och den kör tills den inte kör och då kör den allt annat.
 exec (Write s :stmts) dict input = Expr.value s dict : exec stmts dict input
 -- Write basically does stuff.
@@ -83,11 +77,11 @@ parse_write = accept "write" -# Expr.parse #- require ";" >-> build
 
 instance Parse Statement where
     parse = assignment ! parse_if ! parse_read ! parse_repeat ! parse_seq ! parse_skip ! parse_while ! parse_write
-    toString (Assignment var val) = var ++ ":=" ++ Expr.toString val ++ ";\n" 
-    toString (If cond thenStmts elseStmts) = "if" ++ Expr.toString cond ++ "then\n" ++ toString thenStmts  ++ "else\n" ++ toString elseStmts
-    toString (Read s) = "read" ++ s ++ ";\n"
-    toString (Repeat do_ cond) = "repeat\n" ++ toString do_ ++ "until" ++ Expr.toString cond ++ "\n"
+    toString (Assignment var val) = var ++ " := " ++ Expr.toString val ++ ";\n" 
+    toString (If cond thenStmts elseStmts) = "if " ++ Expr.toString cond ++ " then\n" ++ toString thenStmts  ++ " else\n" ++ toString elseStmts
+    toString (Read s) = "read " ++ s ++ ";\n"
+    toString (Repeat do_ cond) = "repeat\n" ++ toString do_ ++ " until " ++ Expr.toString cond ++ "\n"
     toString (Seq stmts) = "seq\n" ++ concatMap toString stmts ++ "end\n"
     toString (Skip) = "skip;\n"
-    toString (While cond do_) = "while" ++ Expr.toString cond ++ "do\n" ++ toString do_
-    toString (Write e) = "write" ++ Expr.toString e ++ ";\n"
+    toString (While cond do_) = "while " ++ Expr.toString cond ++ " do\n" ++ toString do_
+    toString (Write e) = "write " ++ Expr.toString e ++ ";\n"

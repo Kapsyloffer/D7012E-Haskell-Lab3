@@ -33,8 +33,32 @@ p1 = fromString  ("\
 \  end\
 \write s;")
 
+p2 = fromString ("\
+\count := 0;\
+\repeat\
+\   begin\
+\       count := count + 1;\
+\   end\
+\until count;\
+\write count;")
+
+
+p3 = fromString ("\
+\count := 0;\
+\repeat\
+\   begin\
+\       count := count + 1;\
+\   end\
+\until 1;\
+\write count;")
+
+
 sp = putStr (toString p)
 
 rp = Program.exec p [3,16]
 
 rp1 = Program.exec p1 [1024, 2]
+
+rp2 = Program.exec p2 []
+
+rp3 = Program.exec p3 []
