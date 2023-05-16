@@ -1,3 +1,4 @@
+--Christoffer Lindkvist
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
               spaces, word, (-#), (#-)) where

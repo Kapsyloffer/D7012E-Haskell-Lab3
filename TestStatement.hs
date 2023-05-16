@@ -1,3 +1,4 @@
+--Christoffer Lindkvist
 {- Testfor Statement -}
 module TestStatement where
 

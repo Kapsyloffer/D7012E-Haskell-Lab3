@@ -1,3 +1,4 @@
+--Christoffer Lindkvist
 {- Test for Program -}
 module TestProgram where
 

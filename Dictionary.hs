@@ -1,3 +1,4 @@
+--Christoffer Lindkvist
 module Dictionary (T, empty, lookup, insert) where
 import Prelude hiding (lookup)
 import qualified Prelude

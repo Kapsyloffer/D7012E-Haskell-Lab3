@@ -1,3 +1,4 @@
+--Christoffer Lindkvist
 module Statement(T, parse, toString, fromString, exec) where
 import Prelude hiding (return, fail)
 import Parser hiding (T)
@@ -15,11 +16,6 @@ data Statement =
     | While Expr.T Statement --while loop if true
     | Write Expr.T --Write
     deriving Show
-    
-assignment :: Parser Statement
-assignment = word #- accept ":=" # Expr.parse #- require ";" >-> build
-    where build :: (String, Expr.T) -> Statement 
-          build (v, e) = Assignment v e
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
@@ -55,6 +51,12 @@ exec (While cond do_:stms) dict input =
 exec (Write s :stmts) dict input = Expr.value s dict : exec stmts dict input
 -- Write basically does stuff.
 
+    
+assignment :: Parser Statement --parsea assignment
+assignment = word #- accept ":=" # Expr.parse #- require ";" >-> build
+    where build :: (String, Expr.T) -> Statement 
+          build (v, e) = Assignment v e
+
 parse_if :: Parser Statement --parsea en if then else statement
 parse_if = accept "if" -# Expr.parse #- require "then" # parse #- accept "else" # parse  >-> build
     where build :: ((Expr.T, Statement), Statement) -> Statement
@@ -63,7 +65,7 @@ parse_if = accept "if" -# Expr.parse #- require "then" # parse #- accept "else" 
 parse_read :: Parser Statement --parsear en read statement
 parse_read = accept "read" -# word #- require ";" >-> build
     where build :: String -> Statement
-          build s = Read s
+          build s = Read s#- acc
 
 parse_repeat :: Parser Statement --parsear en repeat
 parse_repeat = accept "repeat" -# parse #- require "until" # Expr.parse #- require ";" >-> build
