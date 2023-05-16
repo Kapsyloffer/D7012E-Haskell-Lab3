@@ -28,7 +28,7 @@ exec (If cond thenStmts elseStmts: stmts) dict input =
     then exec (thenStmts: stmts) dict input
     else exec (elseStmts: stmts) dict input
 -- if [] then [] else []
-exec (Assignment v e: stmts) dict input = exec stmts (Dictionary.insert(v, (Expr.value e dict), dict)) input 
+exec (Assignment v e: stmts) dict input = exec stmts (Dictionary.insert (v, Expr.value e dict) dict) input
 -- v <- e; varav e parsas och Insert returnar den nya dictionarien som används av stmts, som är resten av koden
 exec (Read s: stmts) dict input = exec stmts (Dictionary.insert (s, head input) dict) (tail input)
 -- s <- head of string, varav vi sätter första bokstaven av varje string i s så att den kan läsas.
