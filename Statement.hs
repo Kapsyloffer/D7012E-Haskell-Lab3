@@ -37,14 +37,14 @@ exec (Assignment v e : stmts) dict input = exec stmts (Dictionary.insert (v, Exp
 exec (Read s: stmts) dict input = exec stmts (Dictionary.insert (s, head input) dict) (tail input)
 -- s <- head of string, varav vi sätter första bokstaven av varje string i s så att den kan läsas.
 
-exec (Repeat do_ cond : stmts) dict input = exec (do_ : If cond (Skip) (Repeat do_ cond) : stmts) dict input
---repeat
+exec (Repeat z cond : stmts) dict input = exec (z : If cond (Skip) (Repeat z cond) : stmts) dict input
+--repeatar z om cond är true, om cond är false skippar vi.
 
 exec (Seq s : stmts) dict input = exec ( s ++ stmts ) dict input
 -- Kör en statement åt gången i en sequence, och sen executa resten då headen blivit executad
 
 exec (Skip : stmts) dict input = exec stmts dict input
--- Skippa
+-- Skippa statementen
 
 exec (While cond do_:stms) dict input =  
     if (Expr.value cond dict) > 0 
